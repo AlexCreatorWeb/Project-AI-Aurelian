@@ -805,6 +805,12 @@ strong { color: var(--text); }
    (он остаётся источником значения для отправки формы) и рисуем
    свой список шириной с поле — он не может выйти за границы карточки. */
 
+.field--select {
+  /* нативный селект и триггер выведены из потока — держим высоту поля явно */
+  --control-h: 47px;
+  min-height: var(--control-h);
+}
+
 .field--select > select {
   position: absolute;
   inset: 0;
@@ -832,7 +838,7 @@ strong { color: var(--text); }
   /* пустая кнопка не создаёт строковый бокс — держим высоту равной селекту/инпуту,
      чтобы подчёркивание не «прыгало» при выборе опции */
   line-height: 22px;
-  min-height: 47px;
+  min-height: var(--control-h, 47px);
   transition: border-color .3s ease;
 }
 .select-trigger:focus,

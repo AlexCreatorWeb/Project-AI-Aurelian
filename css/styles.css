@@ -799,6 +799,82 @@ strong { color: var(--text); }
 
 .field select option { background: #111; color: var(--text); }
 
+/* ---------- Кастомный дропдаун «Цель» ----------
+   Нативный попап <select> на мобильных рендерится шириной с контрол
+   от его левого края и вылезает за экран. Скрываем нативный селект
+   (он остаётся источником значения для отправки формы) и рисуем
+   свой список шириной с поле — он не может выйти за границы карточки. */
+
+.field--select > select {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.select-trigger {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #333;
+  padding: 12px 30px 12px 2px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  /* пустая кнопка не создаёт строковый бокс — держим высоту равной селекту/инпуту,
+     чтобы подчёркивание не «прыгало» при выборе опции */
+  line-height: 22px;
+  min-height: 47px;
+  transition: border-color .3s ease;
+}
+.select-trigger:focus,
+.select-trigger:focus-visible { border-bottom-color: var(--gold); }
+
+.select-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  background: linear-gradient(135deg, #111111 0%, #000000 100%);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity .2s ease, transform .2s ease, visibility .2s;
+}
+
+.field--select.open .select-list {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.select-list li {
+  padding: 12px 18px;
+  font-size: 15px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.select-list li:hover,
+.select-list li.active { background: rgba(212, 175, 55, .08); color: var(--text); }
+.select-list li.selected { color: var(--gold); }
+
 .field.invalid input,
 .field.invalid select { border-bottom-color: var(--error); }
 

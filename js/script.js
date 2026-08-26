@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSchedule();
   initNavSpy();
   initForm();
+  initCustomSelect();
   initYear();
 });
 
@@ -275,6 +276,72 @@ function initForm() {
     // Здесь мог бы быть fetch() на бэкенд — пока имитация успешной записи
     form.querySelector('#form-success').hidden = false;
     form.querySelectorAll('input, select, button').forEach(el => (el.disabled = true));
+  });
+}
+
+/* ---------- Кастомный дропдаун «Цель» ----------
+   Нативный попап select на мобильных вылезает за пределы экрана,
+   поэтому рисуем свой список. Нативный select остаётся в форме
+   скрытым: его значение отправляется как раньше, класс .filled
+   и валидация продолжают работать через обычное событие change. */
+function initCustomSelect() {
+  document.querySelectorAll('.field--select').forEach(field => {
+    const select = field.querySelector('select');
+    if (!select || field.querySelector('.select-trigger')) return;
+
+    const labelText = field.querySelector('label')?.textContent.trim() || '';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'select-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    if (labelText) trigger.setAttribute('aria-label', labelText);
+
+    const list = document.createElement('ul');
+    list.className = 'select-list';
+    list.setAttribute('role', 'listbox');
+
+    const open = () => { field.classList.add('open'); trigger.setAttribute('aria-expanded', 'true'); };
+    const close = () => { field.classList.remove('open'); trigger.setAttribute('aria-expanded', 'false'); };
+
+    const syncTrigger = () => {
+      trigger.textContent = select.value || '';
+      list.querySelectorAll('li').forEach(li =>
+        li.classList.toggle('selected', li.dataset.value === select.value));
+    };
+
+    [...select.options].forEach(opt => {
+      if (!opt.value) return; // пустой option-заглушка пропускаем
+      const li = document.createElement('li');
+      li.textContent = opt.value;
+      li.dataset.value = opt.value;
+      li.setAttribute('role', 'option');
+      li.addEventListener('click', () => {
+        select.value = opt.value;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        syncTrigger();
+        close();
+        trigger.focus();
+      });
+      list.appendChild(li);
+    });
+
+    trigger.addEventListener('click', () =>
+      field.classList.contains('open') ? close() : open());
+    [trigger, list].forEach(el => el.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { close(); trigger.focus(); }
+    }));
+    document.addEventListener('click', e => {
+      if (!field.contains(e.target)) close();
+    });
+
+    // нативный селект убираем из tab-порядка — фокус ловит кнопка
+    select.tabIndex = -1;
+
+    field.appendChild(trigger);
+    field.appendChild(list);
+    syncTrigger();
   });
 }
 

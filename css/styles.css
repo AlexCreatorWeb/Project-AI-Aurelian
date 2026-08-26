@@ -669,7 +669,11 @@ strong { color: var(--text); }
   align-items: stretch;
 }
 
-.plan { display: flex; flex-direction: column; }
+.plan {
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+}
 
 .plan--featured {
   border-color: var(--gold-dim);
@@ -687,10 +691,11 @@ strong { color: var(--text); }
 
 .plan__price {
   font-family: var(--font-display);
-  font-size: clamp(34px, 3.4vw, 44px);
+  font-size: 40px;
   font-weight: 800;
   color: var(--text);
   margin-block: 20px 32px;
+  white-space: nowrap;
 }
 .plan__price span {
   font-family: var(--font-body);
